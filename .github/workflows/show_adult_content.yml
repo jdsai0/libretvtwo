@@ -1,0 +1,43 @@
+name: Show Adult Content (Sunday)
+
+on:
+  schedule:
+    # 每周日凌晨 0:00 (UTC+8 = 16:00 UTC 周六)
+    - cron: '0 16 * * 6'
+  # 添加手动触发选项
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: '触发原因（可选）'
+        required: false
+        default: '测试触发'
+
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Update config
+        run: |
+          # 使用sed替换配置值
+          sed -i 's/const HIDE_BUILTIN_ADULT_APIS = true;/const HIDE_BUILTIN_ADULT_APIS = false;/' libretvtwo/js/config.js
+      
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add libretvtwo/js/config.js
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            git commit -m "chore: show adult content APIs (Manual Test: ${{ github.event.inputs.reason }})"
+          else
+            git commit -m "chore: show adult content APIs for Sunday [automated]"
+          fi
+          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }} 
