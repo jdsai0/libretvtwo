@@ -23,13 +23,13 @@ jobs:
       - name: Update config
         run: |
           # 使用sed替换配置值
-          sed -i 's/const HIDE_BUILTIN_ADULT_APIS = false;/const HIDE_BUILTIN_ADULT_APIS = true;/' libretvtwo/js/config.js
+          sed -i 's/const HIDE_BUILTIN_ADULT_APIS = false;/const HIDE_BUILTIN_ADULT_APIS = true;/' js/config.js
       
       - name: Commit changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add libretvtwo/js/config.js
+          git add js/config.js
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             git commit -m "chore: hide adult content APIs (Manual Test: ${{ github.event.inputs.reason }})"
           else
